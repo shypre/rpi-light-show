@@ -6,8 +6,8 @@ import atexit
 NUM_PIXELS = 144
 GPIO_PIN = 18
 
-INTENSITY = 2
-DELAY = 1
+INTENSITY = 12
+DELAY = 0.1
 # End config
 
 
