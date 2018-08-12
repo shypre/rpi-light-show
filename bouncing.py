@@ -1,9 +1,11 @@
 from np_simplelib import *
 
 
-FOREGROUND = (0,   255, 0, INTENSITY)
-BACKGROUND = (255, 255, 255, int(INTENSITY/2))
+FOREGROUND = (0,   255, 0)
+BACKGROUND = (255, 255, 255)
 MIN_DISTANCE = 8
+
+DELAY = 0.05
 
 """r, g, b, a = 0, 0, 0, 0
 while True:
@@ -20,8 +22,8 @@ while True:
 """
 set_all(BACKGROUND)
 while True:
-	for n in range(NUM_PIXELS):
-		np.setPixelColorRGB((n-1+255)%255, *BACKGROUND)
-		np.setPixelColorRGB(n, *FOREGROUND)
-		np.show()
-		time.sleep(DELAY)
+    for n in range(NUM_PIXELS):
+        np.setPixelColorRGB((n-1)%(NUM_PIXELS), *BACKGROUND)
+        np.setPixelColorRGB(n, *FOREGROUND)
+        np.show()
+        time.sleep(DELAY)

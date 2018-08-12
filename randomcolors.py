@@ -17,13 +17,13 @@ DELAY = 0.01
 
 color_idx = 0
 
-FROM_END = False
+FROM_END = True
 LAST_COLOR = COLORS[0]
 while True:
     FROM_END = not FROM_END
     target = range(NUM_PIXELS)
     if FROM_END:
-        target = reversed(target)
+        target = list(reversed(target))
 
     for pixel in target:
         # Choose a random color only some of the time
@@ -34,5 +34,9 @@ while True:
             LAST_COLOR = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         
         np.setPixelColorRGB(pixel, *LAST_COLOR)
+        time.sleep(DELAY)
+        np.show()
+    for pixel in target:
+        np.setPixelColorRGB(pixel, 0, 0, 0)
         time.sleep(DELAY)
         np.show()
