@@ -1,4 +1,5 @@
 from np_simplelib import *
+from terminal_output import *
 import time
 from random import *
 
@@ -39,6 +40,7 @@ def rgb_steps():
     for i in range(NUM_PIXELS):
         np.setPixelColorRGB(i, *pixels_rgb[i])
     np.show()
+    print_leds_strip(pixels_rgb)
 
 while True:
     rgb_steps()
