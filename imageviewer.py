@@ -5,6 +5,7 @@ Projects an image on to a LED matrix via GPIO.
 
 import argparse
 from PIL import Image
+import terminal_output
 
 LED_INTENSITY = 25
 
@@ -26,6 +27,7 @@ def draw_led_matrix(np, image):
             x = 0
         else:
             x += 1
+    terminal_output.print_led_grid_np(np._led_data, 16, 16)
     np.show()
 
 def main():
