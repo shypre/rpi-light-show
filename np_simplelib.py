@@ -1,16 +1,18 @@
-from neopixel import *
+from rpi_ws281x import *
 import time
 import atexit
 
 # Begin config
-NUM_PIXELS = 144
+NUM_PIXELS = 256
+WIDTH = 16
+HEIGHT = 16
 GPIO_PIN = 18
 
 INTENSITY = 25
 # End config
 
 
-np = Adafruit_NeoPixel(NUM_PIXELS, GPIO_PIN, brightness=INTENSITY)
+np = PixelStrip(NUM_PIXELS, GPIO_PIN, brightness=INTENSITY, strip_type = ws.WS2811_STRIP_GRB)
 
 np.begin()
 
@@ -35,3 +37,6 @@ def rgb_normalize(r, g, b):
         return r, g, b
     coeff = 255/maxvalue
     return int(r*coeff), int(g*coeff), int(b*coeff)
+
+def RGB(color):
+    r = color
