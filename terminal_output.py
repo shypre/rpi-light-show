@@ -1,8 +1,12 @@
 def color_to_rgb(color):
+    if isinstance(color, tuple):  # Newer LEDGrid stores (r, g, b) tuple
+        return color
+    elif not isinstance(color, int):  # Invalid color data
+        return (0,0,0)
     b = color & 255
     g = (color >> 8) & 255
     r = (color >> 16) & 255
-    return [r,g,b]
+    return (r,g,b)
 
 def print_led_strip(led_strip):
     line = ""
