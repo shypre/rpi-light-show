@@ -15,6 +15,7 @@ LED_INTENSITY = 25
 def process_image(filename, size):
     im = Image.open(filename)
     out = im.resize((size, size))
+    out = out.convert("RGB")  # Convert to RGB
     return out
 
 def draw_led_matrix(grid, image):
