@@ -110,6 +110,7 @@ while True:
                 else:
                     my_grid.set(x, y, BG_COLOR, allowOverwrite=True)
                 y -= 1
+            pixelstrip.show()
         else:
             # Fallback mode is just #'s
             print('#' * num_bars)
