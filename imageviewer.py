@@ -11,6 +11,11 @@ import terminal_output
 from simplegrid import *
 
 LED_INTENSITY = 25
+VERBOSE = False
+
+def debug_print(*args, **kwargs):
+    if VERBOSE:
+        print(*args, **kwargs)
 
 def process_image(filename, size):
     im = Image.open(filename)
@@ -22,7 +27,7 @@ def draw_led_matrix(grid, image):
     x = y = 0
     for num, pixel in enumerate(image.getdata()):
         # Tracking x, y is only for debug purposes
-        print("Drawing pixel %s\tat (%d, %d)" % (pixel, x, y))
+        debug_print("DEBUG: Drawing pixel %s\tat (%d, %d)\tnum=%s" % (pixel, x, y, num))
 
         grid.set(x, y, pixel)
 
@@ -37,8 +42,11 @@ def main():
     parser.add_argument('filename', type=str, help='filename of the image to display')
     parser.add_argument('boardsize', type=int, help='the width and height of the LED matrix')
     parser.add_argument('gpionum', type=int, help='the target GPIO pin')
+    parser.add_argument('--verbose', '-v', action='store_true', help='enables verbose output')
 
     args = parser.parse_args()
+    global VERBOSE
+    VERBOSE = args.verbose
     try:
         from rpi_ws281x import PixelStrip
     except ImportError:
