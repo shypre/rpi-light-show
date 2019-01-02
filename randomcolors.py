@@ -32,7 +32,7 @@ while True:
             #LAST_COLOR = random.choice(COLORS)
             # Randomly generate an RGB color
             LAST_COLOR = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-        
+
         np.setPixelColorRGB(pixel, *LAST_COLOR)
         time.sleep(DELAY)
         np.show()
