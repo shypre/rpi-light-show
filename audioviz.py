@@ -64,7 +64,7 @@ start_color = tuple(map(int, args.top_color.split(',')))
 end_color = tuple(map(int, args.bottom_color.split(',')))
 assert len(start_color) == 3
 assert len(end_color) == 3
-                
+
 # XXX not a very rigorous check
 if not args.filename.lower().endswith('.wav'):
     # Decode other formats to WAV first in memory
@@ -110,7 +110,7 @@ def do_fft():
             next_data_lock.release()
             next_data_ready.wait()
             next_data_lock.acquire()
-        
+
         print('reading next_data')
         np_arr = np.frombuffer(next_data, dtype=np.int16)
         fft = np.fft.fft(np_arr, n=args.boardsize*2)
@@ -143,9 +143,9 @@ def do_fft():
                         #print('Setting (%s, %s) to %s' % (x, y, str(BG_COLOR)))
                         my_grid.set(x, y, BG_COLOR, allowOverwrite=True)
                     y -= 1
+                pixelstrip.show()
             else:
                 print('#' * num_bars)
-        pixelstrip.show()
         time.sleep(DELAY)
         next_data_ready.clear()
         print('Done drawing bars')
@@ -176,7 +176,6 @@ while True:
 
     if want_next_data.is_set():
         with next_data_lock:
-            global next_data
             next_data = data
             #print('Sending in new data', next_data)
             print('Sending in new data')
