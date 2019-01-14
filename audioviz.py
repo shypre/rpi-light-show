@@ -7,6 +7,7 @@ import io
 import wave
 import traceback
 import threading
+import argparse
 
 import pyaudio
 import numpy as np
@@ -26,10 +27,6 @@ except ImportError:
     terminal_output = None
     traceback.print_exc()
 
-# TODO: make these command line arguments
-MATRIX_SIZE = 16
-GPIO_PIN = 18
-
 LED_INTENSITY = 25
 BAR_COLOR = (255, 255, 255)  # TODO: make dynamic based on height
 BG_COLOR = (0, 0, 0)
@@ -39,14 +36,19 @@ CHUNK = 2048
 # FFT_SIZE_MULTIPLIER = 3 uses the first third of data (0 to ~14kHz)
 FFT_SIZE_MULTIPLIER = 3
 
-filename = sys.argv[1]  # TODO: switch to argparse
+parser = argparse.ArgumentParser(description='Plays music and projects a visualization onto an LED matrix.')
+parser.add_argument('filename', type=str, help='file to play')
+parser.add_argument('boardsize', type=int, help='the width and height of the LED matrix')
+parser.add_argument('gpionum', type=int, help='the target GPIO pin')
+parser.add_argument('--verbose', '-v', action='store_true', help='enables verbose output')
+args = parser.parse_args()
 
 # XXX not a very rigorous check
-if not filename.lower().endswith('.wav'):
+if not args.filename.lower().endswith('.wav'):
     # Decode other formats to WAV first in memory
     print('Decoding to WAV - this will be much faster if you convert it yourself beforehand!')
     wavebuf = io.BytesIO()
-    with audioread.audio_open(filename) as f:
+    with audioread.audio_open(args.filename) as f:
         samplerate = f.samplerate
         waveobj = wave.open(wavebuf, 'wb')
         waveobj.setnchannels(f.channels)
@@ -58,7 +60,7 @@ if not filename.lower().endswith('.wav'):
         waveobj.close()
     wavebuf.seek(0)
 else:
-    wavebuf = open(filename, 'rb')
+    wavebuf = open(args.filename, 'rb')
 
 p = pyaudio.PyAudio()
 waveread = wave.open(wavebuf, 'rb')
@@ -69,12 +71,12 @@ stream = p.open(format=pyaudio.paInt16,
 
 my_grid = None
 if PixelStrip:  # Init ws281x stuff if found
-    pixelstrip = PixelStrip(MATRIX_SIZE**2, GPIO_PIN, brightness=LED_INTENSITY)
+    pixelstrip = PixelStrip(args.boardsize**2, args.gpionum, brightness=LED_INTENSITY)
     pixelstrip.begin()
-    my_grid = led_grid.LEDGrid(pixelstrip, grid.SerpentinePattern.TOP_RIGHT, MATRIX_SIZE, MATRIX_SIZE, default_value=BG_COLOR)
+    my_grid = led_grid.LEDGrid(pixelstrip, grid.SerpentinePattern.TOP_RIGHT, args.boardsize, args.boardsize, default_value=BG_COLOR)
 
 # Dump the frequency table for reference
-freqtable = np.fft.fftfreq(MATRIX_SIZE*FFT_SIZE_MULTIPLIER, d=1/waveread.getframerate())
+freqtable = np.fft.fftfreq(args.boardsize*FFT_SIZE_MULTIPLIER, d=1/waveread.getframerate())
 print("Bars on the visualizer will correspond to these frequency bins:")
 for freq in freqtable[:int(len(freqtable)/FFT_SIZE_MULTIPLIER)]:
     print(freq, "Hz")
@@ -85,7 +87,7 @@ while True:
     if not data:
         break
     np_arr = np.frombuffer(data, dtype=np.int16)
-    fft = np.fft.fft(np_arr, n=MATRIX_SIZE*FFT_SIZE_MULTIPLIER)
+    fft = np.fft.fft(np_arr, n=args.boardsize*FFT_SIZE_MULTIPLIER)
     # With fft the second half of the data does not map to a physical quantity (negative frequencies in freqtable),
     # so we always cut off at least half the data
     fft = fft[:int(len(fft)/FFT_SIZE_MULTIPLIER)]
@@ -95,14 +97,14 @@ while True:
     for x, value in enumerate(fft):
         if value > 0:
             # XXX need a better algorithm
-            num_bars = int((np.log(value) / MATRIX_SIZE) ** 2 * MATRIX_SIZE)
+            num_bars = int((np.log(value) / args.boardsize) ** 2 * args.boardsize)
         else:
             num_bars = 0
 
         # RPI/ GPIO specific stuff
         if PixelStrip:
             # Draw the bars left to right, bottom to top
-            y = MATRIX_SIZE-1
+            y = args.boardsize-1
             while y > 0:
                 if num_bars > 0:
                     my_grid.set(x, y, BAR_COLOR, allowOverwrite=True)
