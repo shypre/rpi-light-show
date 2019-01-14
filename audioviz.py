@@ -48,7 +48,7 @@ def linear_gradient(start, end, n):
 CHUNK = 2048
 # FFT_SIZE_MULTIPLIER should always be >= 2 (Nyquist's theorem)
 # FFT_SIZE_MULTIPLIER = 3 uses the first third of data (0 to ~14kHz)
-FFT_SIZE_MULTIPLIER = 3
+FFT_SIZE_MULTIPLIER = 2
 
 parser = argparse.ArgumentParser(description='Plays music and projects a visualization onto an LED matrix.')
 parser.add_argument('filename', type=str, help='file to play')
@@ -114,7 +114,7 @@ def do_fft():
         print('reading next_data')
         np_arr = np.frombuffer(next_data, dtype=np.int16)
         fft = np.fft.fft(np_arr, n=args.boardsize*2)
-        fft = fft[:int(len(fft)/(FFT_SIZE_MULTIPLIER if len(fft) > 2*args.boardsize else 2))]  # use first half of data
+        fft = fft[:int(len(fft)/(FFT_SIZE_MULTIPLIER))]  # use first half of data
         fft = np.abs(fft)
         for x, value in enumerate(fft):
             print('On x=%s, value=%s' % (x, value))
@@ -123,7 +123,7 @@ def do_fft():
                 num_bars = int((np.log(value) / args.boardsize) ** 2 * args.boardsize)
             else:
                 num_bars = 0
-            print('num_bars=%s' % num_bars)
+            #print('num_bars=%s' % num_bars)
 
             # RPI/ GPIO specific stuff
             if PixelStrip:
